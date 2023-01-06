@@ -1,0 +1,99 @@
+version: '3'
+
+services:
+#     mysql:
+#       image: mysql:5.7
+#       volumes:
+#         - todo-mysql-data:/var/lib/mysql
+#       environment: 
+#       - MYSQL_DATABASE=db_account
+#       - MYSQL_ROOT_PASSWORD=root
+    
+#       ports:
+#         - '3306:3306'
+      
+# volumes:
+#   todo-mysql-data:
+
+  # account-service-api:
+  #   container_name: api_container
+  #   build:
+  #     context: ./account_service_api
+  #     dockerfile: ./account_service_api.dockerfile
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   networks:
+  #     - vpc-dev
+  #   ports:
+  #     - '8080:8080'
+  #   depends_on:
+  #     - account-service
+
+  # account-service:
+  #   container_name: grpc_container
+  #   build:
+  #     context: ./account_service
+  #     dockerfile: ./account_service.dockerfile
+  #   restart: always
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   networks:
+  #     - vpc-dev
+  #   ports:
+  #     - 5055:5055
+  #   depends_on:
+  #     - postgres      
+  #   environment:
+  #     DSN: "host=localhost port=5432 user=postgres password=postgres dbname=db_account sslmode=disable timezone=UTC connect_timeout=5"
+
+  postgres:
+    container_name: pg_container
+    image: postgres:14.0
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    networks:
+      - vpc-dev
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=db_account
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+      - ../src/infra/database/migrations/001_create_initial_schema.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+#   rabbitmq:
+#     container_name: 'rabbitmq'
+#     image: rabbitmq:3-management-alpine
+#     environment:
+#       RABBITMQ_DEFAULT_USER: "admin"
+#       RABBITMQ_DEFAULT_PASS: "admin"
+#       RABBITMQ_DEFAULT_VHOST: "/"
+#     ports:
+#       - 15672:15672
+#       - 5672:5672     
+#     volumes:
+#        - ./db-data/rabbitmq/:/var/lib/rabbitmq/
+#     networks:
+#        - rabbitmq_go_net
+
+# networks:
+#   rabbitmq_go_net:
+#     driver: bridge
+
+  # docker exec -it 7c3e744f80a7 mysql -uroot -p
+
+  # DDL - LINGUAGEM DE DEFINIÇÃO DE DADOS
+
+  # DML - SELECT, INSERT, UPDATE, DELETE....
+
+networks:
+  vpc-dev:
+    driver:
+      bridge

@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "shared/contracts/protog";
+
+package shared;
+
+enum AccountType {
+    LEAD = 0;
+    NORMAL = 1;
+    PREMIUM = 2;
+}
+
+message Account {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string cell_phone = 4;
+    AccountType accountType = 5;
+    float credit_limit = 6;
+    google.protobuf.Timestamp  created_at = 7;
+    google.protobuf.Timestamp  updated_at = 8;
+}
+
+message AccountRequest {
+    Account data = 1;
+}
+
+message AccountResponse {
+    Account result = 1;
+}
+
+message AccountListResponse {
+    repeated Account result = 1;
+}
+
+message AccountFilterRequest {
+    string account_id = 1;
+    string account_type = 2;
+}
+
+message AccountDeleteRequest {
+    string account_id = 1;
+}
+
+message CreditLimiteRequest {
+    string account_type = 1;
+    float credit_limit = 2;
+}
+
+message Empty{}
+
+service AccountService {
+    rpc CreateAccount (AccountRequest) returns (AccountResponse);
+    rpc UpdateAccount (AccountRequest) returns (Empty);
+    rpc DeleteAccount (AccountDeleteRequest) returns (Empty);
+    rpc FindOne(AccountFilterRequest) returns (AccountResponse);
+    rpc FindMany(AccountFilterRequest) returns (AccountListResponse);
+    rpc CreditLimitApply(CreditLimiteRequest) returns (Empty);
+}
